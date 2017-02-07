@@ -182,7 +182,7 @@ export function initializeElement(element: CustomElement) {
 				return element.getWidgetInstance().properties[ propertyName ];
 			},
 			set(value: any) {
-				const [ propertyName, propertyValue ] = getWidgetPropertyFromAttribute(attribute.attributeName, value, attribute);
+				const [ propertyName, propertyValue ] = getWidgetPropertyFromAttribute(attribute.attributeName, String(value), attribute);
 				element.getWidgetInstance().setProperties(assign({}, element.getWidgetInstance().properties, {
 					[propertyName]: propertyValue
 				}));
