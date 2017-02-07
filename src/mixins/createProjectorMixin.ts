@@ -1,11 +1,13 @@
-import global from '@dojo/core/global';
+import 'maquette/dist/css-transitions.min';
 import compose, { ComposeFactory } from '@dojo/compose/compose';
+import global from '@dojo/core/global';
 import { EventTargettedObject, Handle } from '@dojo/interfaces/core';
 import { VNode } from '@dojo/interfaces/vdom';
 import Promise from '@dojo/shim/Promise';
 import WeakMap from '@dojo/shim/WeakMap';
 import { createProjector as createMaquetteProjector, Projector as MaquetteProjector } from 'maquette';
 import { Widget, WidgetOptions, WidgetProperties } from '../interfaces';
+
 /**
  * Represents the state of the projector
  */
@@ -223,7 +225,7 @@ const createProjectorMixin: ProjectorMixinFactory = compose<ProjectorMixin, Proj
 	}
 }).mixin({
 	initialize(instance: Projector, options: ProjectorOptions = {}) {
-		const { root = document.body, cssTransitions = false } = options;
+		const { root = document.body, cssTransitions = true } = options;
 		const maquetteProjectorOptions: { transitions?: any } = {};
 
 		if (cssTransitions) {
