@@ -1,11 +1,10 @@
+import global from '@dojo/core/global';
+import { assign } from '@dojo/core/lang';
+import { from as arrayFrom } from '@dojo/shim/array';
 import { w } from './d';
 import { WidgetProperties, WidgetFactory, Widget, DNode } from './interfaces';
-import createProjectorMixin from './mixins/createProjectorMixin';
+import createProjectorMixin, { Projector } from './mixins/createProjectorMixin';
 import createDomWrapper from './util/createDomWrapper';
-import { assign } from '@dojo/core/lang';
-import { Projector } from './mixins/createProjectorMixin';
-import { from as arrayFrom } from '@dojo/shim/array';
-import global from '@dojo/core/global';
 
 /**
  * @type CustomElementAttributeDescriptor
@@ -20,6 +19,7 @@ export interface CustomElementAttributeDescriptor {
 	attributeName: string;
 	propertyName?: string;
 	value?: (value: string | null) => any;
+	type?: 'boolean' | 'number' | 'string';
 }
 
 /**
@@ -122,13 +122,20 @@ export interface CustomElement extends HTMLElement {
 }
 
 function getWidgetPropertyFromAttribute(attributeName: string, attributeValue: string | null, descriptor: CustomElementAttributeDescriptor): [ string, any ] {
-	let { propertyName = attributeName, value = attributeValue } = descriptor;
+	let { propertyName = attributeName, value = attributeValue, type = 'string' } = descriptor;
+	let resultingValue: any = attributeValue;
 
 	if (typeof value === 'function') {
-		value = value(attributeValue);
+		resultingValue = value(attributeValue);
+	}
+	else if (type === 'number') {
+		resultingValue = parseInt(value || '0', 10);
+	}
+	else if (type === 'boolean') {
+		resultingValue = (!(!attributeValue || attributeValue.toLowerCase() === 'false' || attributeValue === '0'));
 	}
 
-	return [ propertyName, value ];
+	return [ propertyName, resultingValue ];
 }
 
 let customEventClass = global.CustomEvent;
@@ -263,6 +270,7 @@ export function handleAttributeChanged(element: CustomElement, name: string, new
 	attributes.forEach((attribute) => {
 		if (attribute.attributeName === name) {
 			const [ propertyName, propertyValue ] = getWidgetPropertyFromAttribute(name, newValue, attribute);
+			console.log(propertyName, propertyValue);
 			element.getWidgetInstance().setProperties(assign(
 				{},
 				element.getWidgetInstance().properties,
