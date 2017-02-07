@@ -649,7 +649,7 @@ You can explicitly map widget properties to DOM node attributes with the `attrib
         {
             attributeName: 'delete-on-focus',
             propertyName: 'deleteOnFocus',
-            value: value => Boolean(value || 0)
+            type: 'boolean'
         }
     ]
 }
@@ -657,8 +657,10 @@ You can explicitly map widget properties to DOM node attributes with the `attrib
 
 * `attributeName` refers to the attribute that will set on the DOM element, so, `<text-widget label="test" />`.
 * `propertyName` refers to the property on the widget to set, and if not set, defaults to the `attributeName`.
+* `type` lets you specify a value type. Default value is `string`, but you could also use `number` or `boolean`. Boolean values 
+  are converted such that `''`, `'false'` and `'0'` return `false` while other string values return `true`. 
 * `value` lets you specify a transformation function on the attribute value. This function should return the value that
-will be set on the widget's property.
+will be set on the widget's property. Note that you cannot use both `value` and `type` - `value` will take precedence.
 
 Adding an attribute to the element will automatically add a corresponding property to the element as well.
 
