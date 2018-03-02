@@ -1042,13 +1042,6 @@ function render(projectionOptions: ProjectionOptions) {
 		const { parentVNode, dnode } = instanceMap.get(instance)!;
 		const instanceData = widgetInstanceMap.get(instance)!;
 		updateDom(dnode, toInternalWNode(instance, instanceData), projectionOptions, parentVNode, instance);
-
-		if (has('diagnostics')) {
-			dlog('render.widget', {
-				widgetId: (<any>instance)._widgetId,
-				dnode: convertDNode(dnode)
-			});
-		}
 	}
 	runAfterRenderCallbacks(projectionOptions);
 	runDeferredRenderCallbacks(projectionOptions);
