@@ -8,6 +8,9 @@ import { afterRender } from './../decorators/afterRender';
 import { v } from './../d';
 import { Registry } from './../Registry';
 import { dom } from './../vdom';
+import has from '@dojo/has/has';
+import { dlog } from '@dojo/diagnostics/dlog';
+import { xpathForElement } from '@dojo/diagnostics/transform';
 
 /**
  * Represents the attach state of the projector
@@ -271,6 +274,13 @@ export function ProjectorMixin<P, T extends Constructor<WidgetBase<P>>>(Base: T)
 				case AttachType.Merge:
 					this._projection = dom.merge(this.root, this, this._projectionOptions);
 					break;
+			}
+
+			if (has('diagnostics')) {
+				dlog('projector.attached', {
+					widgetId: this._widgetId,
+					attachPoint: xpathForElement(this.root)
+				});
 			}
 
 			return this._attachHandle;

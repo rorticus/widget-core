@@ -1,22 +1,25 @@
+import { dlog } from '@dojo/diagnostics/dlog';
+import has from '@dojo/has/has';
+import { from as arrayFrom } from '@dojo/shim/array';
 import global from '@dojo/shim/global';
+import WeakMap from '@dojo/shim/WeakMap';
+import { isVNode, isWNode, VNODE, WNODE } from './d';
 import {
 	CoreProperties,
 	DefaultWidgetBaseInterface,
 	DNode,
-	VNode,
-	WNode,
-	ProjectionOptions,
 	Projection,
+	ProjectionOptions,
 	SupportedClassName,
 	TransitionStrategy,
-	VNodeProperties
+	VNode,
+	VNodeProperties,
+	WNode
 } from './interfaces';
-import { from as arrayFrom } from '@dojo/shim/array';
-import { isWNode, isVNode, VNODE, WNODE } from './d';
-import { isWidgetBaseConstructor } from './Registry';
-import WeakMap from '@dojo/shim/WeakMap';
 import NodeHandler from './NodeHandler';
+import { isWidgetBaseConstructor } from './Registry';
 import RegistryHandler from './RegistryHandler';
+import { convertDNode } from '@dojo/diagnostics/transform';
 
 const NAMESPACE_W3 = 'http://www.w3.org/';
 const NAMESPACE_SVG = NAMESPACE_W3 + '2000/svg';
@@ -1026,6 +1029,14 @@ function render(projectionOptions: ProjectionOptions) {
 		const { parentVNode, dnode } = instanceMap.get(instance)!;
 		const instanceData = widgetInstanceMap.get(instance)!;
 		updateDom(dnode, toInternalWNode(instance, instanceData), projectionOptions, parentVNode, instance);
+
+		if (has('diagnostics')) {
+			console.log(dnode);
+			dlog('render.widget', {
+				widgetId: (<any>instance)._widgetId,
+				dnode: convertDNode(dnode)
+			});
+		}
 	}
 	runAfterRenderCallbacks(projectionOptions);
 	runDeferredRenderCallbacks(projectionOptions);
