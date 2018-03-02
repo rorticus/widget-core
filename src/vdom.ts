@@ -19,7 +19,7 @@ import {
 import NodeHandler from './NodeHandler';
 import { isWidgetBaseConstructor } from './Registry';
 import RegistryHandler from './RegistryHandler';
-import { convertDNode } from '@dojo/diagnostics/transform';
+import { convertDNode, xpathForElement } from '@dojo/diagnostics/transform';
 
 const NAMESPACE_W3 = 'http://www.w3.org/';
 const NAMESPACE_SVG = NAMESPACE_W3 + '2000/svg';
@@ -780,6 +780,12 @@ function createDom(
 		dnode.instance = instance;
 		const instanceData = widgetInstanceMap.get(instance)!;
 		instanceData.invalidate = () => {
+			if (has('diagnostics')) {
+				dlog('invalidate.widget', {
+					widgetId: (<any>instance)._widgetId
+				});
+			}
+
 			instanceData.dirty = true;
 			if (instanceData.rendering === false) {
 				const renderQueue = renderQueueMap.get(projectionOptions.projectorInstance)!;
@@ -876,6 +882,13 @@ function updateDom(
 				const rendered = instance.__render__();
 				dnode.rendered = filterAndDecorateChildren(rendered, instance);
 				updateChildren(parentVNode, previousRendered, dnode.rendered, instance, projectionOptions);
+
+				if (has('diagnostics')) {
+					dlog('render.widget', {
+						widgetId: (<any>instance)._widgetId,
+						dnode: convertDNode(dnode)
+					});
+				}
 			} else {
 				dnode.rendered = previousRendered;
 			}
@@ -1031,7 +1044,6 @@ function render(projectionOptions: ProjectionOptions) {
 		updateDom(dnode, toInternalWNode(instance, instanceData), projectionOptions, parentVNode, instance);
 
 		if (has('diagnostics')) {
-			console.log(dnode);
 			dlog('render.widget', {
 				widgetId: (<any>instance)._widgetId,
 				dnode: convertDNode(dnode)
@@ -1051,6 +1063,13 @@ export const dom = {
 		const instanceData = widgetInstanceMap.get(instance)!;
 		const finalProjectorOptions = getProjectionOptions(projectionOptions, instance);
 
+		if (has('diagnostics')) {
+			dlog('projector.attached', {
+				widgetId: (<any>instance)._widgetId,
+				attachPoint: xpathForElement(parentNode)
+			});
+		}
+
 		finalProjectorOptions.rootNode = parentNode;
 		const parentVNode = toParentVNode(finalProjectorOptions.rootNode);
 		const node = toInternalWNode(instance, instanceData);
@@ -1058,6 +1077,12 @@ export const dom = {
 		instanceMap.set(instance, { dnode: node, parentVNode });
 		renderQueueMap.set(finalProjectorOptions.projectorInstance, renderQueue);
 		instanceData.invalidate = () => {
+			if (has('diagnostics')) {
+				dlog('invalidate.widget', {
+					widgetId: (<any>instance)._widgetId
+				});
+			}
+
 			instanceData.dirty = true;
 			if (instanceData.rendering === false) {
 				const renderQueue = renderQueueMap.get(finalProjectorOptions.projectorInstance)!;

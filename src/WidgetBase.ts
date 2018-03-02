@@ -19,8 +19,6 @@ import RegistryHandler from './RegistryHandler';
 import NodeHandler from './NodeHandler';
 import { widgetInstanceMap } from './vdom';
 import { isWidgetBaseConstructor, WIDGET_BASE_TYPE } from './Registry';
-import { dlog } from '@dojo/diagnostics/dlog';
-import has from '@dojo/has/has';
 
 interface ReactionFunctionArguments {
 	previousProperties: any;
@@ -37,8 +35,6 @@ export type BoundFunctionData = { boundFunc: (...args: any[]) => any; scope: any
 
 const decoratorMap = new Map<Function, Map<string, any[]>>();
 const boundAuto = auto.bind(null);
-
-let sharedWidgetId = 0;
 
 /**
  * Main widget base for all widgets to extend
@@ -89,13 +85,10 @@ export class WidgetBase<P = WidgetProperties, C extends DNode = DNode> implement
 
 	private _nodeHandler: NodeHandler = new NodeHandler();
 
-	protected _widgetId: number;
-
 	/**
 	 * @constructor
 	 */
 	constructor() {
-		this._widgetId = ++sharedWidgetId;
 		this._children = [];
 		this._decoratorCache = new Map<string, any[]>();
 		this._properties = <P>{};
@@ -275,12 +268,6 @@ export class WidgetBase<P = WidgetProperties, C extends DNode = DNode> implement
 		const instanceData = widgetInstanceMap.get(this)!;
 		if (instanceData.invalidate) {
 			instanceData.invalidate();
-
-			if (has('diagnostics')) {
-				dlog('invalidate.widget', {
-					widgetId: this._widgetId
-				});
-			}
 		}
 	}
 
